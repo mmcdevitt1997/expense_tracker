@@ -1,6 +1,6 @@
 # expense_tracker
 
-A new Flutter project.
+This is a flutter tutorial app to track expenses. It is a simple app that allows you to add expenses and view them in a chart. For learning the basics of flutter.
 
 ## Getting Started
 
