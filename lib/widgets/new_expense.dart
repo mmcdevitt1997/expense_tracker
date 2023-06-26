@@ -71,74 +71,164 @@ class _NewExpenseState extends State<NewExpense> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
-      child: Column(children: [
-        TextField(
-          controller: _titleController,
-          maxLength: 50,
-          decoration: const InputDecoration(labelText: 'Title'),
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Amount',
-                  prefix: Text('\$ '),
+    final keyboardSpace = MediaQuery.of(context).viewInsets.bottom;
+    return LayoutBuilder(builder: (ctx, constraints) {
+      final width = constraints.maxWidth;
+      final height = constraints.maxHeight;
+      return SizedBox(
+        height: double.infinity,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
+            child: Column(children: [
+              if (width >= 600)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _titleController,
+                        maxLength: 50,
+                        decoration: const InputDecoration(labelText: 'Title'),
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          labelText: 'Amount',
+                          prefix: Text('\$ '),
+                        ),
+                        controller: _amountController,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                )
+              else
+                TextField(
+                  controller: _titleController,
+                  maxLength: 50,
+                  decoration: const InputDecoration(labelText: 'Title'),
                 ),
-                controller: _amountController,
-                keyboardType: TextInputType.number,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.center,
+              if (width >= 600)
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(_selectedDate == null
+                              ? 'No date chosen'
+                              : formatter.format(_selectedDate!)),
+                          IconButton(
+                            onPressed: _presentDatePicker,
+                            icon: const Icon(Icons.calendar_month),
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          DropdownButton(
+                            value: _selectedCategory,
+                            items: expense_model.Category.values
+                                .map((category) => DropdownMenuItem(
+                                    value: category,
+                                    child: Text(category.name.toUpperCase())))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedCategory =
+                                    value as expense_model.Category;
+                              });
+                            },
+                          ),
+                          const Spacer(),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          ElevatedButton(
+                            onPressed: _submitExpenseData,
+                            child: const Text('Save Expense'),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                )
+              else
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          labelText: 'Amount',
+                          prefix: Text('\$ '),
+                        ),
+                        controller: _amountController,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(_selectedDate == null
+                              ? 'No date chosen'
+                              : formatter.format(_selectedDate!)),
+                          IconButton(
+                            onPressed: _presentDatePicker,
+                            icon: const Icon(Icons.calendar_month),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              const SizedBox(height: 16),
+              Row(
                 children: [
-                  Text(_selectedDate == null
-                      ? 'No date chosen'
-                      : formatter.format(_selectedDate!)),
-                  IconButton(
-                    onPressed: _presentDatePicker,
-                    icon: const Icon(Icons.calendar_month),
-                  )
+                  DropdownButton(
+                    value: _selectedCategory,
+                    items: expense_model.Category.values
+                        .map((category) => DropdownMenuItem(
+                            value: category,
+                            child: Text(category.name.toUpperCase())))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedCategory = value as expense_model.Category;
+                      });
+                    },
+                  ),
+                  const Spacer(),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _submitExpenseData,
+                    child: const Text('Save Expense'),
+                  ),
                 ],
-              ),
-            )
-          ],
+              )
+            ]),
+          ),
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            DropdownButton(
-              value: _selectedCategory,
-              items: expense_model.Category.values
-                  .map((category) => DropdownMenuItem(
-                      value: category,
-                      child: Text(category.name.toUpperCase())))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedCategory = value as expense_model.Category;
-                });
-              },
-            ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: _submitExpenseData,
-              child: const Text('Save Expense'),
-            ),
-          ],
-        )
-      ]),
-    );
+      );
+    });
   }
 }
